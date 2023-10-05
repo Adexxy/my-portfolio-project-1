@@ -34,4 +34,3 @@ pipeline {
 
     }     
 }
-Completed-Projects/my-portfolio-project-1/recipe_app/recipe-app-frontend
