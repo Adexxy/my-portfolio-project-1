@@ -28,7 +28,7 @@ pipeline {
         stage('Test') {
             steps {
                 // Run tests if you have any
-                sh 'cd recipe_app/recipe-app-frontend && npm install && npm run build'
+                sh 'cd recipe_app/recipe-app-frontend && npm test'
             }
         }
 
