@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const { MongoClient } = require('mongodb');  // Import MongoClient
 const app = express();
 
 app.use(cors());
@@ -18,6 +19,22 @@ const recipes = [
     instructions: ['Stir-fry chicken and vegetables', 'Add soy sauce'],
   },
 ];
+
+// MongoDB connection URI
+const uri = 'mongodb://username:password@localhost:27017/mydatabase'; // Update with your MongoDB connection URI
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+async function connectToDatabase() {
+  try {
+    await client.connect();
+    console.log('Connected to MongoDB');
+  } catch (error) {
+    console.error('Error connecting to MongoDB:', error);
+  }
+}
+
+// Call this function to connect to MongoDB
+connectToDatabase();
 
 app.get('/api/recipes', (req, res) => {
   res.json(recipes);
