@@ -2,10 +2,14 @@ pipeline {
     agent {
         docker {
             image 'node:14' // Use the official Node.js image with version 14.x
-            args '-p 3000:3000' // If your React app is running on port 3000
+            args '-p 3000:3000 -p 5000:5001' // If your React app is running on port 3000
         }
     }
 
+    environment {
+        CI = 'true'
+    }
+    
     stages {
         stage('Checkout') {
             steps {
