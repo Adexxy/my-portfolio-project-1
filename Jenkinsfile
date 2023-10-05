@@ -18,6 +18,15 @@ pipeline {
             }
         }
 
+        stage('Install Dependencies') {
+            steps {
+                // Navigate to the frontend folder
+                dir('recipe_app/recipe-app-frontend') {
+                    sh 'npm install --save-dev jest babel-jest @babel/preset-env @babel/preset-react'
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 // Install dependencies and build the React app
