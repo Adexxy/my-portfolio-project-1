@@ -21,14 +21,14 @@ pipeline {
         stage('Build') {
             steps {
                 // Install dependencies and build the React app
-                sh 'cd recipe-app/recipe-app-frontend && npm install && npm run build'
+                sh 'cd recipe_app/recipe-app-frontend && npm install && npm run build'
             }
         }
 
         stage('Test') {
             steps {
                 // Run tests if you have any
-                sh 'cd recipe-app/recipe-app-frontend && npm install && npm run build'
+                sh 'cd recipe_app/recipe-app-frontend && npm install && npm run build'
             }
         }
 
