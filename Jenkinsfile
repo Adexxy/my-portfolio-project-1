@@ -32,5 +32,21 @@ pipeline {
             }
         }
 
+        stage('Package') {
+            steps {
+                // Package your React app
+                // For example, create a tar.gz file
+                sh 'tar -czvf frontend-package.tar.gz recipe_app/recipe-app-frontend/build'
+            }
+        }
+
+        stage('Preview & Manual Approval') {
+            steps {
+                // sh 'cd build && python -m http.server &'
+                sh 'npm start &'
+                sh "echo 'Now...Visit http://localhost:3000 to see your Node.js/React application in action.'"
+                input "Preview the application and approve to proceed"
+            }
+        }
     }     
 }
