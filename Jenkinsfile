@@ -22,7 +22,7 @@ pipeline {
             steps {
                 // Navigate to the frontend folder
                 dir('recipe_app/recipe-app-frontend') {
-                    sh 'npm install --save-dev jest babel-jest @babel/preset-env @babel/preset-react'
+                    sh 'npm install --save-dev @babel/preset-env @babel/preset-react babel-jest'
                 }
             }
         }
