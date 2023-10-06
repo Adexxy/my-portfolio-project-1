@@ -1,12 +1,4 @@
 module.exports = {
-    transform: {
-      '^.+\\.(js|jsx)$': 'babel-jest',
-    },
-};
-
-"jest": {
-    "transform": {
-        "^.+\\.jsx?$": "babel-jest"
-    }
-}
-  
+    preset: "@vue/cli-plugin-unit-jest",
+    transformIgnorePatterns: ["node_modules/(?!axios)"],
+  };
