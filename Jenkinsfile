@@ -77,7 +77,7 @@ pipeline{
         stage('Build Container Images of Frontend and Backend'){
             steps{
                 sh 'docker build -t adexxy/node-react-frontend:latest recipe_app/recipe-app-frontend/'
-                sh 'docker build -t adexxy/node-react-backend:latest recipe_app/recipe-app-backend/Dockerfile'
+                sh 'docker build -t adexxy/node-react-backend:latest recipe_app/recipe-app-backend/'
             }
         }
 
