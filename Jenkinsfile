@@ -5,6 +5,10 @@ pipeline{
         nodejs 'nodejs_23'
     }
 
+    environment {
+        CI = 'false'
+    }
+
     stages{
         stage('Checkout Code'){
             steps{
