@@ -69,7 +69,7 @@ pipeline{
         stage('Package App'){
             steps{
                 dir('recipe_app/recipe-app-frontend'){
-                    sh 'tar -czfv recipe-app-frontend.tar.gz build/'
+                    sh 'tar -czf recipe-app-frontend.tar.gz build/'
                 }
             }
         }
