@@ -1,0 +1,80 @@
+# Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels: # Fixed from "matchLabel"
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: adexxy/node-react-frontend:latest
+          ports:
+            - containerPort: 80
+      # Uncomment this block for resource limits
+      # resources:
+      #   limits:
+      #     cpu: "0.5"
+      #     memory: "500Mi"
+
+---
+# Frontend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP
+
+---
+# Backend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: adexxy/node-react-backend:latest # Updated for backend image
+          ports:
+            - containerPort: 3000
+      # Uncomment this block for resource limits
+      # resources:
+      #   limits:
+      #     cpu: "0.5"
+      #     memory: "500Mi"
+
+---
+# Backend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: ClusterIP
