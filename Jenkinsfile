@@ -14,7 +14,7 @@ pipeline{
 
         stage('Install Dependencies'){
             steps{
-                dir('recipe-app-frontend'){
+                dir('recipe_app/recipe-app-frontend'){
                     sh 'npm install'
                 }
             }
@@ -22,7 +22,7 @@ pipeline{
 
         stage('Test'){
             steps{
-                dir('recipe-app-frontend'){
+                dir('recipe_app/recipe-app-frontend'){
                     sh 'npm test'
                 }
             }
@@ -30,7 +30,7 @@ pipeline{
 
         stage('Build'){
             steps{
-                dir('recipe-app-frontend'){
+                dir('recipe_app/recipe-app-frontend'){
                     sh 'npm run build'
                 }
             }
@@ -38,7 +38,7 @@ pipeline{
 
         stage('Preview and Approve'){
             steps{
-                dir('recipe-app-frontend'){
+                dir('recipe_app/recipe-app-frontend'){
                     sh 'npm start &'
                     sh "echo 'Now...Visit http://localhost:3000 to see your Node.js/React application in action.'"
                     input 'Preview the application and approve to proceed'
