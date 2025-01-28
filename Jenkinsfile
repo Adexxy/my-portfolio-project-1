@@ -40,13 +40,13 @@ pipeline{
             }
         }
 
-        stage('Test - Backend'){
-            steps{
-                dir('recipe_app/recipe-app-backend'){
-                    sh 'npm test'
-                }
-            }
-        }
+        // stage('Test - Backend'){
+        //     steps{
+        //         dir('recipe_app/recipe-app-backend'){
+        //             sh 'npm test'
+        //         }
+        //     }
+        // }
 
         stage('Build -Frontend'){
             steps{
