@@ -77,14 +77,14 @@ pipeline{
         stage('Build Container Images of Frontend and Backend'){
             steps{
                 sh 'docker build -t adexxy/node-react-frontend:latest recipe_app/recipe-app-frontend/'
-                sh 'docker build -t adexxy/node-react-backend:latest recipe_app/recipe-app-backend/'
+                sh 'docker build -t adexxy/node-react-backend:latest recipe_app/recipe-app-backend/Dockerfile'
             }
         }
 
         stage('Push to Dockerhub'){
             steps{
                 withCredentials([usernamePassword(credentialsId: 'dockerid', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_NAME')]){
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_NAME'
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_NAME --password-stdin'
                     sh 'docker push adexxy/node-react-frontend:latest'
                     sh 'docker push adexxy/node-react-backend:latest'
                 }
