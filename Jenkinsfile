@@ -97,8 +97,8 @@ pipeline{
                     sh '''
                     echo "Using kubeconfig from: $KUBECONFIG"
                     cat $KUBECONFIG  # Debug: Show kubeconfig file contents
-                    sudo microk8s kubectl config view  # Debug: Show active kubeconfig
-                    sudo microk8s kubectl apply -f kubernetes-deployment.yaml
+                    microk8s kubectl config view  # Debug: Show active kubeconfig
+                    microk8s kubectl apply -f kubernetes-deployment.yaml
                     '''
                 }
             }
