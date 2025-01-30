@@ -98,7 +98,7 @@ pipeline{
                     echo "Using kubeconfig from: $KUBECONFIG"
                     cat $KUBECONFIG  # Debug: Show kubeconfig file contents
                     kubectl config view  # Debug: Show active kubeconfig
-                    kubectl apply -f kubernetes-deplyment.yaml
+                    kubectl apply -f kubernetes-deployment.yaml
                     '''
                 }
             }
