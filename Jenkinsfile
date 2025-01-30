@@ -93,12 +93,12 @@ pipeline{
 
         stage('Deploy to Kubernetes Server'){
             steps{
-                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]){
+                withCredentials([file(credentialsId: 'microk8s-config', variable: 'KUBECONFIG')]){
                     sh '''
                     echo "Using kubeconfig from: $KUBECONFIG"
                     cat $KUBECONFIG  # Debug: Show kubeconfig file contents
-                    kubectl config view  # Debug: Show active kubeconfig
-                    kubectl apply -f kubernetes-deployment.yaml
+                    sudo microk8s kubectl config view  # Debug: Show active kubeconfig
+                    sudo microk8s kubectl apply -f kubernetes-deployment.yaml
                     '''
                 }
             }
