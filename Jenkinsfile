@@ -16,85 +16,90 @@ pipeline{
             }
         }
 
-        stage('Install Dependencies - Frontend'){
-            steps{
-                dir('recipe_app/recipe-app-frontend'){
-                    sh 'npm install'
-                }
-            }
-        }
+        // stage('Install Dependencies - Frontend'){
+        //     steps{
+        //         dir('recipe_app/recipe-app-frontend'){
+        //             sh 'npm install'
+        //         }
+        //     }
+        // }
 
-        stage('Install Dependencies - Backend'){
-            steps{
-                dir('recipe_app/recipe-app-backend'){
-                    sh 'npm install'
-                }
-            }
-        }
-
-        stage('Test Frontend'){
-            steps{
-                dir('recipe_app/recipe-app-frontend'){
-                    sh 'npm test'
-                }
-            }
-        }
-
-        // stage('Test - Backend'){
+        // stage('Install Dependencies - Backend'){
         //     steps{
         //         dir('recipe_app/recipe-app-backend'){
+        //             sh 'npm install'
+        //         }
+        //     }
+        // }
+
+        // stage('Test Frontend'){
+        //     steps{
+        //         dir('recipe_app/recipe-app-frontend'){
         //             sh 'npm test'
         //         }
         //     }
         // }
 
-        stage('Build -Frontend'){
-            steps{
-                dir('recipe_app/recipe-app-frontend'){
-                    sh 'npm run build'
-                }
-            }
-        }
+        // // stage('Test - Backend'){
+        // //     steps{
+        // //         dir('recipe_app/recipe-app-backend'){
+        // //             sh 'npm test'
+        // //         }
+        // //     }
+        // // }
 
-        stage('Preview and Approve'){
-            steps{
-                dir('recipe_app/recipe-app-frontend'){
-                    sh 'npm start &'
-                    sh "echo 'Now...Visit http://localhost:3000 to see your Node.js/React application in action.'"
-                    input 'Preview the application and approve to proceed'
-                }
-            }
-        }
+        // stage('Build -Frontend'){
+        //     steps{
+        //         dir('recipe_app/recipe-app-frontend'){
+        //             sh 'npm run build'
+        //         }
+        //     }
+        // }
 
-        stage('Package App'){
-            steps{
-                dir('recipe_app/recipe-app-frontend'){
-                    sh 'tar -czf recipe-app-frontend.tar.gz build/'
-                }
-            }
-        }
+        // stage('Preview and Approve'){
+        //     steps{
+        //         dir('recipe_app/recipe-app-frontend'){
+        //             sh 'npm start &'
+        //             sh "echo 'Now...Visit http://localhost:3000 to see your Node.js/React application in action.'"
+        //             input 'Preview the application and approve to proceed'
+        //         }
+        //     }
+        // }
 
-        stage('Build Container Images of Frontend and Backend'){
-            steps{
-                sh 'docker build -t adexxy/node-react-frontend:latest recipe_app/recipe-app-frontend/'
-                sh 'docker build -t adexxy/node-react-backend:latest recipe_app/recipe-app-backend/'
-            }
-        }
+        // stage('Package App'){
+        //     steps{
+        //         dir('recipe_app/recipe-app-frontend'){
+        //             sh 'tar -czf recipe-app-frontend.tar.gz build/'
+        //         }
+        //     }
+        // }
 
-        stage('Push to Dockerhub'){
-            steps{
-                withCredentials([usernamePassword(credentialsId: 'dockerid', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_NAME')]){
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_NAME --password-stdin'
-                    sh 'docker push adexxy/node-react-frontend:latest'
-                    sh 'docker push adexxy/node-react-backend:latest'
-                }
-            }
-        }
+        // stage('Build Container Images of Frontend and Backend'){
+        //     steps{
+        //         sh 'docker build -t adexxy/node-react-frontend:latest recipe_app/recipe-app-frontend/'
+        //         sh 'docker build -t adexxy/node-react-backend:latest recipe_app/recipe-app-backend/'
+        //     }
+        // }
+
+        // stage('Push to Dockerhub'){
+        //     steps{
+        //         withCredentials([usernamePassword(credentialsId: 'dockerid', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_NAME')]){
+        //             sh 'echo $DOCKER_PASS | docker login -u $DOCKER_NAME --password-stdin'
+        //             sh 'docker push adexxy/node-react-frontend:latest'
+        //             sh 'docker push adexxy/node-react-backend:latest'
+        //         }
+        //     }
+        // }
 
         stage('Deploy to Kubernetes Server'){
             steps{
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]){
-                    sh 'kubectl apply -f kubernetes-deplyment.yaml'
+                    sh '''
+                    echo "Using kubeconfig from: $KUBECONFIG"
+                    cat $KUBECONFIG  # Debug: Show kubeconfig file contents
+                    kubectl config view  # Debug: Show active kubeconfig
+                    kubectl apply -f kubernetes-deplyment.yaml
+                    '''
                 }
             }
         }
@@ -195,6 +200,140 @@ pipeline{
 //         }
 //         failure {
 //             echo 'Pipeline failed!'
+//         }
+//     }
+// }
+
+
+
+// pipeline {
+//     agent any
+   
+//     environment {
+//         AWS_REGION = '<REGION-CODE>'
+//         ECR_REPO = '<ECR-REPO-LINK>'
+//         DOCKER_IMAGE_NAME = '<Your-IMG-NAME>'
+//         KUBECONFIG = "/var/lib/jenkins/.kube/config" //locate in jenkins EC2 serevr
+//     }
+   
+//     stages {
+//         stage('Build Docker Image') {
+//             steps {
+//                 script {
+//                     // Build Docker image
+//                     docker.build("$DOCKER_IMAGE_NAME:${env.GIT_COMMIT}")
+//                 }
+//             }
+//         }
+       
+//         stage('Tag Docker Image') {
+//             steps {
+//                 script {
+//                     // Tag Docker image using Docker command directly
+//                     sh "docker tag $DOCKER_IMAGE_NAME:${env.GIT_COMMIT} $ECR_REPO:${env.GIT_COMMIT}"
+//                 }
+//             }
+//         }
+
+
+//         stage('Push to ECR') {
+//             steps {
+//                 script {
+//                     // Authenticate Docker client to ECR using AWS CLI
+//                     withCredentials([aws(credentialsId: 'AWS-Credentials', region: AWS_REGION)]) {
+//                         sh "aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO"
+//                     }
+                   
+//                     // Push Docker image to ECR
+//                     sh "docker push $ECR_REPO:${env.GIT_COMMIT}"
+//                 }
+//             }
+//         }
+
+//         stage('Deploy to EKS') {
+//             steps {
+//                 script {
+//                     // Set KUBECONFIG environment variable
+//                     withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
+//                         // Get the latest image tag from the GIT_COMMIT environment variable
+//                         def imageTag = env.GIT_COMMIT
+                        
+//                         // Replace the placeholder ${IMAGE_TAG} in deployment.yaml with the actual image tag
+//                         sh "sed -i 's|\${IMAGE_TAG}|${imageTag}|' deployment.yaml"
+                        
+//                         // Apply deployment.yaml to the EKS cluster
+//                         sh "kubectl apply -f deployment.yaml"
+//                         sh "kubectl apply -f service.yaml"
+//                     }
+//                 }
+//             }
+//         }
+//     }
+
+// }
+
+
+
+
+
+// pipeline{
+//     agent any
+
+//     environment{
+//         DOCKER_IMAGE_F = frontend
+//         DOCKER_IMAGE_B = backend
+//         IMAGE_TAG = 'latest'
+//     }
+
+//     stages{
+//         stage('Checkout Code'){
+//             steps(
+//                 checkout scm
+//             )
+//         }
+
+//         stage('Install Dependencies and Build'){
+//             steps{
+//                 sh 'npm install'
+//             }
+//         }
+
+//         stage('Test'){
+//             steps{
+//                 sh 'npm test'
+//             }
+//         }
+
+//         stage('Preview and Approve'){
+//             steps{
+//                 sh 'npm start &'
+//                 sh "echo 'Now...Visit http://localhost:3000 to see your Node.js/React application in action.' "
+//                 input 'Preview the application and approve to proceed'
+//             }
+//         }
+
+//         stage('Build Container Image'){
+//             steps{
+//                 sh 'docker build -t $DOCKER_IMAGE_F:$IMAGE_TAG .'
+//                 sh 'docker build -t $DOCKER_IMAGE_B:$IMAGE_TAG .'
+//             }
+//         }
+
+//         stage('Push to Repository'){
+//             steps{
+//                 withCredentials([usernamePassword(credntialsId: 'dockerid', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_NAME')]){
+//                     sh 'docker push $DOCKER_IMAGE_F:$IMAGE_TAG'
+//                     sh 'docker push $DOCKER_IMAGE_B:$IMAGE_TAG'
+//                 }
+//             }
+//         }
+
+//         stage("Deploy to Kubernetes Server"){
+//             steps{
+//                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBCONFIG')]){
+//                     sh 'kubectl apply -f deployment.yaml'
+//                 }
+//             }
 //         }
 //     }
 // }
