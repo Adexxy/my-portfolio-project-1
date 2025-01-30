@@ -95,10 +95,11 @@ pipeline{
             steps{
                 withCredentials([file(credentialsId: 'microk8s-config', variable: 'KUBECONFIG')]){
                     sh '''
-                    echo "Using kubeconfig from: $KUBECONFIG"
-                    cat $KUBECONFIG  # Debug: Show kubeconfig file contents
-                    kubectl config view  # Debug: Show active kubeconfig
-                    kubectl apply -f kubernetes-deployment.yaml
+                    // echo "Using kubeconfig from: $KUBECONFIG"
+                    // cat $KUBECONFIG  # Debug: Show kubeconfig file contents
+                    // kubectl config view  # Debug: Show active kubeconfig
+                    // kubectl apply -f kubernetes-deployment.yaml
+                    kubectl delete -f kubernetes-deployment.yaml
                     '''
                 }
             }
