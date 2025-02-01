@@ -16,80 +16,80 @@ pipeline{
             }
         }
 
-        // stage('Install Dependencies - Frontend'){
-        //     steps{
-        //         dir('recipe_app/recipe-app-frontend'){
-        //             sh 'npm install'
-        //         }
-        //     }
-        // }
+        stage('Install Dependencies - Frontend'){
+            steps{
+                dir('recipe_app/recipe-app-frontend'){
+                    sh 'npm install'
+                }
+            }
+        }
 
-        // stage('Install Dependencies - Backend'){
+        stage('Install Dependencies - Backend'){
+            steps{
+                dir('recipe_app/recipe-app-backend'){
+                    sh 'npm install'
+                }
+            }
+        }
+
+        stage('Test Frontend'){
+            steps{
+                dir('recipe_app/recipe-app-frontend'){
+                    sh 'npm test'
+                }
+            }
+        }
+
+        // stage('Test - Backend'){
         //     steps{
         //         dir('recipe_app/recipe-app-backend'){
-        //             sh 'npm install'
-        //         }
-        //     }
-        // }
-
-        // stage('Test Frontend'){
-        //     steps{
-        //         dir('recipe_app/recipe-app-frontend'){
         //             sh 'npm test'
         //         }
         //     }
         // }
 
-        // // stage('Test - Backend'){
-        // //     steps{
-        // //         dir('recipe_app/recipe-app-backend'){
-        // //             sh 'npm test'
-        // //         }
-        // //     }
-        // // }
+        stage('Build -Frontend'){
+            steps{
+                dir('recipe_app/recipe-app-frontend'){
+                    sh 'npm run build'
+                }
+            }
+        }
 
-        // stage('Build -Frontend'){
-        //     steps{
-        //         dir('recipe_app/recipe-app-frontend'){
-        //             sh 'npm run build'
-        //         }
-        //     }
-        // }
+        stage('Preview and Approve'){
+            steps{
+                dir('recipe_app/recipe-app-frontend'){
+                    sh 'npm start &'
+                    sh "echo 'Now...Visit http://localhost:3000 to see your Node.js/React application in action.'"
+                    input 'Preview the application and approve to proceed'
+                }
+            }
+        }
 
-        // stage('Preview and Approve'){
-        //     steps{
-        //         dir('recipe_app/recipe-app-frontend'){
-        //             sh 'npm start &'
-        //             sh "echo 'Now...Visit http://localhost:3000 to see your Node.js/React application in action.'"
-        //             input 'Preview the application and approve to proceed'
-        //         }
-        //     }
-        // }
+        stage('Package App'){
+            steps{
+                dir('recipe_app/recipe-app-frontend'){
+                    sh 'tar -czf recipe-app-frontend.tar.gz build/'
+                }
+            }
+        }
 
-        // stage('Package App'){
-        //     steps{
-        //         dir('recipe_app/recipe-app-frontend'){
-        //             sh 'tar -czf recipe-app-frontend.tar.gz build/'
-        //         }
-        //     }
-        // }
+        stage('Build Container Images of Frontend and Backend'){
+            steps{
+                sh 'docker build -t adexxy/node-react-frontend:latest recipe_app/recipe-app-frontend/'
+                sh 'docker build -t adexxy/node-react-backend:latest recipe_app/recipe-app-backend/'
+            }
+        }
 
-        // stage('Build Container Images of Frontend and Backend'){
-        //     steps{
-        //         sh 'docker build -t adexxy/node-react-frontend:latest recipe_app/recipe-app-frontend/'
-        //         sh 'docker build -t adexxy/node-react-backend:latest recipe_app/recipe-app-backend/'
-        //     }
-        // }
-
-        // stage('Push to Dockerhub'){
-        //     steps{
-        //         withCredentials([usernamePassword(credentialsId: 'dockerid', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_NAME')]){
-        //             sh 'echo $DOCKER_PASS | docker login -u $DOCKER_NAME --password-stdin'
-        //             sh 'docker push adexxy/node-react-frontend:latest'
-        //             sh 'docker push adexxy/node-react-backend:latest'
-        //         }
-        //     }
-        // }
+        stage('Push to Dockerhub'){
+            steps{
+                withCredentials([usernamePassword(credentialsId: 'dockerid', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_NAME')]){
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_NAME --password-stdin'
+                    sh 'docker push adexxy/node-react-frontend:latest'
+                    sh 'docker push adexxy/node-react-backend:latest'
+                }
+            }
+        }
 
         stage('Deploy to Kubernetes Server'){
             steps{
@@ -97,9 +97,9 @@ pipeline{
                     sh '''
                     # echo "Using kubeconfig from: $KUBECONFIG"
                     # cat $KUBECONFIG  # Debug: Show kubeconfig file contents
-                    # kubectl config view  # Debug: Show active kubeconfig
-                    # kubectl apply -f kubernetes-deployment.yaml
-                    kubectl delete -f kubernetes-deployment.yaml
+                    kubectl config view  # Debug: Show active kubeconfig
+                    kubectl apply -f kubernetes-deployment.yaml
+                    # kubectl delete -f kubernetes-deployment.yaml
                     '''
                 }
             }
