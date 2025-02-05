@@ -443,11 +443,9 @@ pipeline{
                 }
 
                 stage('Build Container Image - Backend'){
-                    stage('Build Container Image - Backend'){
-                        steps{
-                            dir('recipe_app/recipe-app-frontend'){
-                                sh 'docker build -t adexxy/node-react-backend:$IMAGE_VERSION -f Dockerfile .'
-                            }
+                    steps{
+                        dir('recipe_app/recipe-app-frontend'){
+                            sh 'docker build -t adexxy/node-react-backend:$IMAGE_VERSION -f Dockerfile .'
                         }
                     }
                 }
