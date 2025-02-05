@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: adexxy/node-react-frontend:latest
+          image: adexxy/node-react-backend:05a15e7
           ports:
             - containerPort: 80
       # Uncomment this block for resource limits
@@ -58,7 +58,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: adexxy/node-react-backend:latest # Updated for backend image
+          image: adexxy/node-react-backend:05a15e7 # Updated for backend image
           ports:
             - containerPort: 3000
       # Uncomment this block for resource limits
