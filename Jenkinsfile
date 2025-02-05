@@ -429,7 +429,7 @@ pipeline{
             }
         }
 
-        stage{
+        stage('Build Container Images'){
             parallel{
                 stage('Build Container Image - Frontend'){
                     dir('recipe_app/recipe-app-frontend'){
