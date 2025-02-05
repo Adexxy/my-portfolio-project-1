@@ -1,0 +1,11 @@
+version: '3'
+services:
+  frontend:
+    image: adexxy/node-react-frontend:latest
+    ports:
+      - "3000:80"
+
+  backend:
+    image: adexxy/node-react-backend:latest
+    ports:
+      - "5000:3000"

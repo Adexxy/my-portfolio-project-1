@@ -1,20 +1,24 @@
-pipeline{
-    agent any
+// pipeline{
+//     agent any
 
-    tools{
-        nodejs 'nodejs_23'
-    }
+//     tools{
+//         nodejs 'nodejs_23'
+//     }
 
-    environment {
-        CI = 'false'
-    }
+//     environment {
+//         CI = 'false'
 
-    stages{
-        stage('Checkout Code'){
-            steps{
-                checkout scm
-            }
-        }
+//         // If you want to use a custom versioning scheme (e.g., Git commit SHA), you can set IMAGE_VERSION like this
+//         // IMAGE_VERSION = env.BUILD_ID
+//         // IMAGE_VERSION = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+//     }
+
+//     stages{
+//         stage('Checkout Code'){
+//             steps{
+//                 checkout scm
+//             }
+//         }
 
         // stage('Install Dependencies - Frontend'){
         //     steps{
@@ -91,21 +95,21 @@ pipeline{
         //     }
         // }
 
-        stage('Deploy to Kubernetes Server'){
-            steps{
-                withCredentials([file(credentialsId: 'microk8s-config', variable: 'KUBECONFIG')]){
-                    sh '''
-                    # echo "Using kubeconfig from: $KUBECONFIG"
-                    # cat $KUBECONFIG  # Debug: Show kubeconfig file contents
-                    # kubectl config view  # Debug: Show active kubeconfig
-                    # kubectl apply -f kubernetes-deployment.yaml
-                    kubectl delete -f kubernetes-deployment.yaml
-                    '''
-                }
-            }
-        }
-    }
-}
+//         stage('Deploy to Kubernetes Server'){
+//             steps{
+//                 withCredentials([file(credentialsId: 'microk8s-config', variable: 'KUBECONFIG')]){
+//                     sh '''
+//                     # echo "Using kubeconfig from: $KUBECONFIG"
+//                     # cat $KUBECONFIG  # Debug: Show kubeconfig file contents
+//                     # kubectl config view  # Debug: Show active kubeconfig
+//                     # kubectl apply -f kubernetes-deployment.yaml
+//                     kubectl delete -f kubernetes-deployment.yaml
+//                     '''
+//                 }
+//             }
+//         }
+//     }
+// }
 
 
 
@@ -338,3 +342,123 @@ pipeline{
 //         }
 //     }
 // }
+
+
+
+pipeline{
+    agent any
+
+    tools{
+        nodejs 'nodejs_23'
+    }
+
+    environment {
+        CI = 'false'
+        IMAGE_VERSION = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+    }
+
+    stages{
+        stage('Checkout Code'){
+            steps{ checkout scm }
+        }
+
+        stage('Install Dependencies'){
+            parallel{
+                stage('Install Dependencies - Frontend'){
+                    steps{
+                        dir('recipe_app/recipe-app-frontend'){
+                            sh 'npm install'
+                        }
+                    }
+                }
+
+                stage('Install Dependencies - Backend'){
+                    steps{
+                        dir('recipe_app/recipe-app-backend'){
+                            sh 'npm install'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Test Frontend'){
+            parallel{
+                stage('Test Backend'){
+                    steps{
+                        dir('recipe_app/recipe-app-frontend'){
+                            sh 'npm test'
+                        }
+                    }
+                }
+
+                stage('Test Backend'){
+                    steps{
+                        dir('recipe_app/recipe-app-backend'){
+                            sh 'npm test'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Build - Frontend'){
+            steps{
+                dir('recipe_app/recipe-app-frontend'){
+                    sh 'npm run build'
+                }
+            }
+        }
+
+        stage('Preview and Approve'){
+            steps{
+                sh '''
+                docker compose up -d
+                echo 'Visit http://localhost:3000 for frontend, http://localhost:5000 for backend.'
+                '''
+                input 'Approve deployment?'
+            }
+        }
+
+        stage('Package App'){
+            steps{
+                dir('recipe_app/recipe-app-frontend'){
+                    sh 'tar -czf build.tar.gz -C build .'
+                }
+            }
+        }
+
+        stage('Build Container Images'){
+            steps{
+                sh '''
+                docker build -t adexxy/node-react-frontend:$IMAGE_VERSION --build-arg BUILD_ARCHIVE=recipe_app/recipe-app-frontend/build.tar.gz -f Dockerfile-frontend .
+                docker build -t adexxy/node-react-backend:$IMAGE_VERSION -f Dockerfile-backend .
+                '''
+            }
+        }
+
+        stage('Push to Dockerhub'){
+            steps{
+                withCredentials([usernamePassword(credentialsId: 'dockerid', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_NAME')]){
+                    sh '''
+                    echo $DOCKER_PASS | docker login -u $DOCKER_NAME --password-stdin
+                    docker push adexxy/node-react-frontend:$IMAGE_VERSION
+                    docker push adexxy/node-react-backend:$IMAGE_VERSION
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes'){
+            steps{
+                withCredentials([file(credentialsId: 'microk8s-config', variable: 'KUBECONFIG')]){
+                    sh '''
+                    kubectl apply -f kubernetes-deployment.yaml
+                    kubectl rollout restart deployment frontend-deployment
+                    kubectl rollout restart deployment backend-deployment
+                    '''
+                }
+            }
+        }
+    }
+}
