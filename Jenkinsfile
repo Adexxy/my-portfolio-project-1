@@ -468,9 +468,10 @@ pipeline{
             steps{
                 withCredentials([file(credentialsId: 'microk8s-config', variable: 'KUBECONFIG')]){
                     sh '''
-                    kubectl apply -f kubernetes-deployment.yaml
-                    kubectl rollout restart deployment frontend
-                    kubectl rollout restart deployment backend
+                    # kubectl apply -f kubernetes-deployment.yaml
+                    # kubectl rollout restart deployment frontend
+                    # kubectl rollout restart deployment backend
+                    kubectl delete -f kubernetes-deployment.yaml
                     '''
                 }
             }
