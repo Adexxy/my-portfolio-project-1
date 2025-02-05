@@ -417,6 +417,7 @@ pipeline{
                 echo 'Visit http://localhost:3000 for frontend, http://localhost:5000 for backend.'
                 '''
                 input 'Approve deployment?'
+                sh 'docker compose down'
             }
         }
 
@@ -431,8 +432,9 @@ pipeline{
         stage('Build Container Images'){
             steps{
                 sh '''
-                docker build -t adexxy/node-react-frontend:$IMAGE_VERSION --build-arg BUILD_ARCHIVE=recipe_app/recipe-app-frontend/build.tar.gz -f Dockerfile-frontend .
-                docker build -t adexxy/node-react-backend:$IMAGE_VERSION -f Dockerfile-backend .
+                # docker build -t adexxy/node-react-frontend:$IMAGE_VERSION --build-arg BUILD_ARCHIVE=recipe_app/recipe-app-frontend/build.tar.gz -f Dockerfile-frontend .
+                docker build -t adexxy/node-react-frontend:$IMAGE_VERSION -f recipe_app/recipe-app-frontend/Dockerfile .
+                docker build -t adexxy/node-react-backend:$IMAGE_VERSION -f recipe_app/recipe-app-backend/Dockerfile .
                 '''
             }
         }
