@@ -429,13 +429,26 @@ pipeline{
             }
         }
 
-        stage('Build Container Images'){
-            steps{
-                sh '''
-                # docker build -t adexxy/node-react-frontend:$IMAGE_VERSION --build-arg BUILD_ARCHIVE=recipe_app/recipe-app-frontend/build.tar.gz -f Dockerfile-frontend .
-                docker build -t adexxy/node-react-frontend:$IMAGE_VERSION -f recipe_app/recipe-app-frontend/Dockerfile .
-                docker build -t adexxy/node-react-backend:$IMAGE_VERSION -f recipe_app/recipe-app-backend/Dockerfile .
-                '''
+        stage{
+            parallel{
+                stage('Build Container Image - Frontend'){
+                    dir('recipe_app/recipe-app-frontend'){
+                        steps{
+                            sh '''
+                            # docker build -t adexxy/node-react-frontend:$IMAGE_VERSION --build-arg BUILD_ARCHIVE=recipe_app/recipe-app-frontend/build.tar.gz -f Dockerfile-frontend .
+                            docker build -t adexxy/node-react-frontend:$IMAGE_VERSION -f Dockerfile .
+                            '''
+                        }
+                    }
+                }
+
+                stage('Build Container Image - Backend'){
+                    dir('recipe_app/recipe-app-backend'){
+                        steps{
+                            sh 'docker build -t adexxy/node-react-backend:$IMAGE_VERSION -f Dockerfile .'
+                        }
+                    }
+                }
             }
         }
 
