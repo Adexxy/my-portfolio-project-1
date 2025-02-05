@@ -432,8 +432,8 @@ pipeline{
         stage('Build Container Images'){
             parallel{
                 stage('Build Container Image - Frontend'){
-                    dir('recipe_app/recipe-app-frontend'){
-                        steps{
+                    steps{
+                        dir('recipe_app/recipe-app-frontend'){
                             sh '''
                             # docker build -t adexxy/node-react-frontend:$IMAGE_VERSION --build-arg BUILD_ARCHIVE=recipe_app/recipe-app-frontend/build.tar.gz -f Dockerfile-frontend .
                             docker build -t adexxy/node-react-frontend:$IMAGE_VERSION -f Dockerfile .
@@ -443,9 +443,11 @@ pipeline{
                 }
 
                 stage('Build Container Image - Backend'){
-                    dir('recipe_app/recipe-app-backend'){
+                    stage('Build Container Image - Frontend'){
                         steps{
-                            sh 'docker build -t adexxy/node-react-backend:$IMAGE_VERSION -f Dockerfile .'
+                            dir('recipe_app/recipe-app-frontend'){
+                                sh 'docker build -t adexxy/node-react-backend:$IMAGE_VERSION -f Dockerfile .'
+                            }
                         }
                     }
                 }
