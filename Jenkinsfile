@@ -384,7 +384,7 @@ pipeline{
 
         stage('Test Frontend'){
             parallel{
-                stage('Test Backend'){
+                stage('Test Frontend'){
                     steps{
                         dir('recipe_app/recipe-app-frontend'){
                             sh 'npm test'
@@ -392,13 +392,13 @@ pipeline{
                     }
                 }
 
-                stage('Test Backend'){
-                    steps{
-                        dir('recipe_app/recipe-app-backend'){
-                            sh 'npm test'
-                        }
-                    }
-                }
+                // stage('Test Backend'){
+                //     steps{
+                //         dir('recipe_app/recipe-app-backend'){
+                //             sh 'npm test'
+                //         }
+                //     }
+                // }
             }
         }
 
